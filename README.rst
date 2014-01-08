@@ -38,7 +38,7 @@ it into your project.
 Documentation
 -------------
 
-Online documentation is at https://readthedocs.org/patois
+Online documentation is at http://patois.rtfd.org/
 
 How to Contribute
 -----------------

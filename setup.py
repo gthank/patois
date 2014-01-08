@@ -50,7 +50,7 @@ setup(
     long_description=patois_long_description,
     author='Hank Gay',
     author_email='hank@realultimateprogramming.com',
-    url="http://pypi.python.org/pypi/patois/",
+    url="https://pypi.python.org/pypi/patois/",
     py_modules=['patois',],
     license=patois_license,
     zip_safe=False,
