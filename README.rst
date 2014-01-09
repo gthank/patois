@@ -2,6 +2,9 @@
     patois
 ==============
 
+.. image:: https://travis-ci.org/gthank/patois.png?branch=develop
+   :target: https://travis-ci.org/gthank/patois
+
 ``patois`` is an MIT-licensed compatibility library designed to smooth
 over differences in various Python VMs,
 e.g., CPython vs. Jython vs. PyPy vs. IronPython. It provides utility
