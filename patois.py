@@ -31,12 +31,12 @@ import os
 JYTHON_COMPILED_EXTENSION = '$py.class'
 
 
-def module_name_from_file_name(filename):
+def module_name_from_file_name(file_name):
     """Figure out a module's name given the name of a compiled Python file."""
-    if not filename:
+    if not file_name:
         return None
 
-    if filename.lower().endswith(JYTHON_COMPILED_EXTENSION):
-        return filename[:-len(JYTHON_COMPILED_EXTENSION)]
+    if file_name.lower().endswith(JYTHON_COMPILED_EXTENSION):
+        return file_name[:-len(JYTHON_COMPILED_EXTENSION)]
 
-    return os.path.splitext(filename)[0]
+    return os.path.splitext(file_name)[0]
