@@ -1,4 +1,4 @@
-"""Utilities for writing code that runs CPython, Jython, and other VMs."""
+"""Utilities for writing code that runs on CPython, Jython, and other VMs."""
 from __future__ import (print_function, absolute_import,
                         unicode_literals, division)
 # Copyright (c) 2014 Hank Gay
@@ -21,6 +21,22 @@ from __future__ import (print_function, absolute_import,
 # CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 __author__ = 'Hank Gay <hank@realultimateprogramming.com>'
 __version__ = '0.1.0'
+
+
+import os
+
+
+JYTHON_COMPILED_EXTENSION = '$py.class'
+
+
+def module_name_from_file_name(filename):
+    """Figure out a module's name given the name of a compiled Python file."""
+    if not filename:
+        return None
+
+    if filename.lower().endswith(JYTHON_COMPILED_EXTENSION):
+        return filename[:-len(JYTHON_COMPILED_EXTENSION)]
+
+    return os.path.splitext(filename)[0]
