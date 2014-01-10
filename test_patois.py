@@ -28,11 +28,18 @@ import patois
 
 
 class TestPatoisFunctions(unittest.TestCase):
+    """Tests for the unbound functions in ``patois``."""
+
     def test_module_name_from_file_name(self):
+        """Test :py:func:`patois.module_name_from_file_name`."""
         # Standard CPython bytecode filename
         self.assertEqual('a', patois.module_name_from_file_name('a.py'))
+        # Standard CPython bytecode filename that *isn't* all lower-case.
+        self.assertEqual('a', patois.module_name_from_file_name('a.PY'))
         # Jython bytecode filename
         self.assertEqual('a', patois.module_name_from_file_name('a$py.class'))
+        # Jython bytecode filename that *isn't* all lower-case.
+        self.assertEqual('a', patois.module_name_from_file_name('a$PY.CLASS'))
 
 
 if __name__ == '__main__':
