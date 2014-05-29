@@ -25,10 +25,45 @@ from __future__ import (print_function, absolute_import,
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import unittest
 import patois
+import rstr
 
 
 class TestPatoisFunctions(unittest.TestCase):
     """Tests for the unbound functions in ``patois``."""
+    def setUp(self):
+        if patois._is_ucs2():
+            bad_ucs2_string = "([%s-%s](?![%s-%s])|(?<![%s-%s])[%s-%s])"
+            self.bad_string = bad_ucs2_string % (unichr(0xD800), unichr(0xDBFF), unichr(0xDC00), unichr(0xDFFF), unichr(0xD800), unichr(0xDBFF), unichr(0xDC00), unichr(0xDFFF))
+        elif patois._is_ucs4():
+            bad_ucs4_string = "[%s-%s]"
+            self.bad_string = bad_ucs4_string % (unichr(0xD800), unichr(0xDFFF))
+
+    def test_find_invalid_unicode(self):
+        """Test :py:func:`patois.find_invalid_unicode`."""
+        if patois.is_jython():
+            return
+        data = rstr.xeger(self.bad_string)
+        # We expect a non-empty list, so that should evaluate to True.
+        self.assertTrue(patois.find_invalid_unicode(data))
+
+    def test_find_invalid_unicode_iter(self):
+        """Test :py:func:`patois.find_invalid_unicode_iter`."""
+        if patois.is_jython():
+            return
+        data = rstr.xeger(self.bad_string)
+        # We expect a non-empty result. If we get an empty, next() will raise
+        # StopIteration and the test will fail.
+        next(patois.find_invalid_unicode_iter(data))
+
+    def test_scrub_invalid_unicode(self):
+        """Test :py:func:`patois.scrub_invalid_unicode`."""
+        if patois.is_jython():
+            return
+
+        data = rstr.xeger(self.bad_string)
+        before = len(data)
+        after = len(patois.scrub_invalid_unicode(data))
+        self.assertEquals(before, after)
 
     def test_module_name_from_file_name(self):
         """Test :py:func:`patois.module_name_from_file_name`."""

@@ -26,9 +26,67 @@ __version__ = '0.1.0'
 
 
 import os
+import platform
+import re
 
 
-JYTHON_COMPILED_EXTENSION = '$py.class'
+def is_jython():
+    return platform.python_implementation() == "Jython"
+
+
+invalid_unicode_template = "[\u0001-\u0008\u000B\u000E-\u001F\u007F-\u009F\uFDD0-\uFDEF\uFFFE\uFFFF\U0001FFFE\U0001FFFF\U0002FFFE\U0002FFFF\U0003FFFE\U0003FFFF\U0004FFFE\U0004FFFF\U0005FFFE\U0005FFFF\U0006FFFE\U0006FFFF\U0007FFFE\U0007FFFF\U0008FFFE\U0008FFFF\U0009FFFE\U0009FFFF\U000AFFFE\U000AFFFF\U000BFFFE\U000BFFFF\U000CFFFE\U000CFFFF\U000DFFFE\U000DFFFF\U000EFFFE\U000EFFFF\U000FFFFE\U000FFFFF\U0010FFFE\U0010FFFF%s]"
+
+if is_jython():
+    # Jython is based on UTF-16, and as such, does not allow the use of
+    # unmatched surrogate pairs (\uD800-\uDFFF), in literals or otherwise.
+    invalid_unicode_re = re.compile(invalid_unicode_template % "")
+else:
+    # For those cases where unmatched surrogate pairs can exist, we still can't
+    # use them in a literal (because it would break Jython to scan them).
+    # Instead use one extra step of indirection and create surrogates with
+    # unichr.
+    invalid_unicode_re = re.compile(invalid_unicode_template % (
+        "%s-%s" % (unichr(0xD800), unichr(0xDFFF)),))
+
+replace_characters_regexp = re.compile(
+        "([%s-%s](?![%s-%s])|(?<![%s-%s])[%s-%s])" % (
+            unichr(0xD800), unichr(0xDBFF),
+            unichr(0xDC00), unichr(0xDFFF),
+            unichr(0xD800), unichr(0xDBFF),
+            unichr(0xDC00), unichr(0xDFFF)))
+
+
+def find_invalid_unicode(data):
+    if is_jython():
+        return []
+    return invalid_unicode_re.findall(data)
+
+
+def find_invalid_unicode_iter(data):
+    if is_jython():
+        return iter([])
+    return invalid_unicode_re.finditer(data)
+
+
+def scrub_invalid_unicode(data):
+    if is_jython():
+        return data
+    return replace_characters_regexp.sub("\ufffd", data)
+
+
+def _is_ucs2():
+    if is_jython():
+        return false
+    return len("\U0010FFFF") != 1
+
+
+def _is_ucs4():
+    if is_jython():
+        return false
+    return len("\U0010FFFF") == 1
+
+
+JYTHON_COMPILED_EXTENSION = "$py.class"
 
 
 def module_name_from_file_name(file_name):
